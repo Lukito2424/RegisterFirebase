@@ -2,6 +2,7 @@ package com.example.assignment5
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -34,24 +35,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun registerListeners(){
         buttonSubmit.setOnClickListener {
-            val email = editTextEmail.text.toString()
-            val password = editTextPassword.text.toString()
-            val repeatpassword = editTextRepeatPassword.text.toString()
-            val passwordDoesntContainDigits =    !(password.contains("0")) && !(password.contains("1")) && !(password.contains("2")) && !(password.contains("3"))
-                                              && !(password.contains("4")) && !(password.contains("5")) && !(password.contains("6"))
-                                              && !(password.contains("7")) && !(password.contains("8")) && !(password.contains("9"))
+            val email = editTextEmail.text.toString().trim()
+            val password = editTextPassword.text.toString().trim()
+            val repeatpassword = editTextRepeatPassword.text.toString().trim()
 
-            if(!(email.contains("@")) || !(email.contains("."))){
-                editTextEmail.error = "Enter a Valid Email !"
+
+            if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                editTextEmail.error = "Enter a Valid Email"
                 return@setOnClickListener
             }else if( password.length < 9 ){
-                editTextPassword.error = "Password's length must be at least 9 !"
+                editTextPassword.error = "Password's length must be at least 9"
                 return@setOnClickListener
-            } else if(password.isDigitsOnly() || passwordDoesntContainDigits){
-                editTextPassword.error = "Password must contain Symbols and Digits !"
+            } else if(!(password.matches(".*[a-zA-Z].*".toRegex())) || !(password.matches(".*[0-9].*".toRegex()))){
+                editTextPassword.error = "Password must contain both Symbols and Digits"
                 return@setOnClickListener
             } else if(password != repeatpassword){
-                editTextRepeatPassword.error = "Passwords must be equal !"
+                editTextRepeatPassword.error = "Passwords must match"
                 return@setOnClickListener
             }
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
